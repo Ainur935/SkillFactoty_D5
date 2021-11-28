@@ -1,0 +1,54 @@
+python manage.py shell
+from news.models import *
+user1 = User.objects.create_user('Pushkin')
+user2 = User.objects.create_user('Gogol')
+author1 = Author.objects.create(user = user1)
+author2 = Author.objects.create(user = user2)
+category_sport = Category.objects.create(name = 'Sport')
+category_live = Category.objects.create(name = 'Live')
+category_music = Category.objects.create(name = 'Music')
+category_animals = Category.objects.create(name = 'Animals')
+article1_text = 'По данным СМИ, Окс провалила слепое прослушивание, на котором выступала с композицией «ВИА Гры» «Бриллианты», и столкнулась с критикой жюри. Как оказалось, ее исполне
+ние не понравилось никому из судей, а особенно негативно отреагировал Билан, из-за чего после Окс даже поругалась со знаменитым музыкантом. По словам певицы, Билан недостоин сидеть в крес
+ле жюри рядом с легендами сцены, ведь он сам не отличается талантом и профессионализмом.'
+article2_text = 'Главный тренер сборной России Валерий Карпин рассказал, что защитник команды Георгий Джикия будет готов принять участие в матче отбора к ЧМ-2022 с Кипром.'
+news_text = 'В Испании хотят запретить оставлять собак одних больше чем на сутки, пишет "Европульс".Новый законопроект распространяется и на других домашних животных — например, котов
+ и хорьков. Их можно будет оставить максимум на 72 часа. '
+article1 = Post.objects.create(author = author1, is_this_news = False, heading = 'Голос Билана', text = article1_text)
+article2 = Post.objects.create(author = author1, is_this_news = False, heading = 'Джикия', text = article2_text)
+news1 = Post.objects.create(author = author2, heading = 'Животные в Испании', text = news_text)
+PostCategory.objects.create(post = article1, category = category_music)
+PostCategory.objects.create(post = article2, category = category_sport)
+PostCategory.objects.create(post = news1, category = category_animals)
+PostCategory.objects.create(post = article2, category = category_animals)
+comment1 = Comment.objects.create(comment_post = article1, user = user2, comment_text = 'Интересно')
+comment2 = Comment.objects.create(comment_post = article1, user = user2, comment_text = 'Да ладно!')
+comment3 = Comment.objects.create(comment_post = article2, user = user2, comment_text = 'Это хорошо!')
+comment4 = Comment.objects.create(comment_post = news1, user = user1, comment_text = 'То,что надо!')
+article1.like()
+article2.like()
+article2.like()
+article1.dislike()
+news1.like()
+news1.like()
+news1.like()
+news1.like()
+comment1.like()
+comment3.dislike()
+user1_rating = (sum([post.post_rating*3 for post in Post.objects.filter(author = author1)]) + sum([comment.comment_rating for comment in Comment.objects.filter(user = user1)]) + sum([comment.comment_rating for comment in Comment.obje
+cts.filter(comment_post__author = author1)]))
+user2_rating = (sum([post.post_rating*3 for post in Post.objects.filter(author = author2)]) + sum([comment.comment_rating for comment in Comment.objects.filter(user = user2)]) + sum([comment.comment_rating for comment in Comment.ob
+jects.filter(comment_post__author = author2)]))
+author1.update_rating(user1_rating)
+author2.update_rating(user2_rating)
+best_rating_author = Author.objects.all().order_by('-rating_user')[0]
+print('Лучший автор: ', best_rating_author.user)
+print('Рейтинг лучшего автора: ', best_rating_author.rating_user)
+best_post = Post.objects.all().order_by('-post_rating')[0]
+print('Лучшая статья.\nДата добавления:', best_post.creation_time)
+print('Автор:', best_post.author.user)
+print('Рейтинг:', best_post.post_rating)
+print('Заголовок:', best_post.heading)
+print('Превью:', best_post.preview())
+for comment in Comment.objects.filter(comment_post = best_post):
+    print('Дата:', comment.comment_datetime, '\nПользователь:', comment.user, '\nРейтинг:', comment.comment_rating, '\nТекст:', comment.comment_text)
