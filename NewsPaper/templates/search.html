@@ -1,0 +1,48 @@
+<!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
+{% extends 'flatpages/default.html' %}
+
+<!-- Название у нас будет products -->
+{% block title %}
+Posts
+{% endblock title %}
+
+
+{% block content %}
+<form method="GET">
+    {{ filter.form }} <!-- Форму от фильтров за нас сделает Django. А вот кнопку, увы придётся делать самому -->
+    <input type="submit" value="Найти">
+</form>
+<h1>Все новости</h1>
+<h3>Количество новостей:{{posts|length}}</h3>
+<hr>
+{% if posts %}
+<table>
+    <tr>
+        <td>
+            Заголовок
+        </td>
+        <td>
+            Дата публикации
+        </td>
+        <td>
+            Текст
+        </td>
+    </tr>
+{% for post in filter.qs %}
+    <tr>
+        <td>
+            {{post.heading}}
+        </td>
+        <td>
+            {{post.creation_time|date:'d M Y'}}
+        </td>
+        <td>
+            {{post.text|truncatechars:20}}
+        </td>
+    </tr>
+{%endfor%}
+</table>
+{%else%}
+Новостей пока нет.
+{%endif%}
+{% endblock content %}

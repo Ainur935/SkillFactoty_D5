@@ -36,7 +36,8 @@ class Post(models.Model):
         len_ = 124 if len(self.text) > 124 else len(self.text)
         return self.text[:len_]+'...'
 
-
+    def get_absolute_url(self):  # добавим абсолютный путь, чтобы после создания нас перебрасывало на страницу с товаром
+        return f'/posts/{self.id}'
 
 
 class PostCategory(models.Model):
