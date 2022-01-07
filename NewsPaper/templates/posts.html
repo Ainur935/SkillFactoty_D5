@@ -66,4 +66,8 @@ Posts
 Новостей пока нет.
 {%endif%}
 
+{% if is_not_author %}
+<button> <a href='upgrade/'> Стать автором!</a> </button>
+{% endif %}
+
 {% endblock content %}
